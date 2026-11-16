@@ -75,6 +75,26 @@ type RawDados = {
 
 const raw = dadosRaw as unknown as RawDados;
 
+const normalizarStatus = (status?: string | null): Status => {
+  switch (status) {
+    case "aberto":
+    case "novo":
+      return "novo";
+    case "em_atendimento":
+    case "em atendimento":
+      return "em_atendimento";
+    case "aguardando_cliente":
+    case "aguardando cliente":
+      return "aguardando_cliente";
+    case "resolvido":
+      return "resolvido";
+    case "fechado":
+      return "fechado";
+    default:
+      return "novo";
+  }
+};
+
 const categoriasById = Object.fromEntries(
   raw.categorias.map((categoria) => [categoria.id, categoria.nome]),
 ) as Record<string, string>;
@@ -121,7 +141,7 @@ export const dados: Dados = {
     numero: chamado.numero,
     titulo: chamado.titulo,
     descricao: chamado.descricao,
-    status: chamado.status,
+    status: normalizarStatus(chamado.status),
     prioridade: chamado.prioridade,
     categoria: categoriasById[chamado.categoria_id] ?? "Sem categoria",
     grupo_id: chamado.grupo_id,
@@ -134,8 +154,8 @@ export const dados: Dados = {
   mensagens: raw.mensagens,
   historico: raw.historico.map((item) => ({
     chamado_id: item.chamado_id,
-    de: (item.de as Status) ?? "novo",
-    para: (item.para as Status) ?? "novo",
+    de: normalizarStatus(item.de ?? "novo"),
+    para: normalizarStatus(item.para ?? "novo"),
     motivo: item.motivo ?? "Atualização do histórico",
     usuario_id: item.usuario_id,
     em: item.em ?? item.ocorrido_em ?? new Date().toISOString(),
