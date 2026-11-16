@@ -9,7 +9,7 @@ export default function StatusBadge({
   mode: "staff" | "client";
   labels: Record<Status, string>;
 }) {
-  const text = mode === "staff" ? labels[status] : labels[status];
+  const text = labels[status] ?? "Sem status";
 
   return <span className="tag">{text}</span>;
 }
